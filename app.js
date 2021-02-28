@@ -17,7 +17,12 @@
     else if($activity.html().indexOf('virtualride') > 0) {
       return true;
     }
+    // eDad2003 -- filter out Peloton
     else if($activity.html().indexOf('Peloton') > 0) {
+      return true;
+    }
+    // eDad2003 -- filter out TrainerRoad
+    else if($activity.html().indexOf('TrainerRoad') > 0) {
       return true;
     }
     else {
@@ -54,8 +59,28 @@
     return false;
   };
 
+  var isShortWalk = function($activity, minMiles) {
+    if($activity.find('.icon-walk').length > 0) {
+      var $stats = $activity.find('.list-stats .stat');
+      for(var i = 0; i < $stats.length; i++) {
+        var $stat = $( $stats[i] );
+        if($stat.find('.stat-subtext').text().toLowerCase().indexOf('distance') >= 0) {
+          var $value = $stat.find('.stat-text');
+          if(isShortDistance($value, minMiles)) {
+            return true;
+          }
+        }
+      }
+      var $distance = $activity.find('.list-stats li[title="Distance"]');
+      if(isShortDistance($distance, minMiles)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   var isShortDistance = function($value, minMiles) {
-    var unit = $value.find('.unit').text().toLowerCase();
+    var unit = $value.find('.unit').text().toLowerCase().trim();
     var raw = $value.text().toLowerCase();
     var miles = parseFloat(raw.substring(0, raw.length - unit.length));
     if(unit == 'km') {
@@ -114,6 +139,11 @@
         log("Short cycle activity hidden");
       }
 
+      if(options.hideShortWalk > 0 && isShortWalk( $(this), options.hideShortWalk )) {
+        mark( $(this), options.action );
+        log("Short walk activity hidden");
+      }
+
     });
 
     //$('.pagination a.load-feed').last().on('click', function() {
@@ -128,6 +158,7 @@
     hideVirtual: true,
     hideChallenge: false,
     hideShortCycle: 0,
+    hideShortWalk: 0,
   };
 
   var options = defaultOptions;
