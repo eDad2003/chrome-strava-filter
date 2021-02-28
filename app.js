@@ -17,6 +17,9 @@
     else if($activity.html().indexOf('virtualride') > 0) {
       return true;
     }
+    else if($activity.html().indexOf('Peloton') > 0) {
+      return true;
+    }
     else {
       return false;
     }
