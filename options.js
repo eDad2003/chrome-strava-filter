@@ -8,6 +8,7 @@ function save_options() {
   var hideChallenge = document.getElementById('hide_challenge').checked;
   var hideShortCycle = document.getElementById('hide_short_cycle').selectedOptions[0].value;
   var hideShortWalk = document.getElementById('hide_short_walk').selectedOptions[0].value;
+  var hideShortAct = document.getElementById('hide_short_act').selectedOptions[0].value;
 
   chrome.storage.sync.set({
     action: action,
@@ -16,6 +17,7 @@ function save_options() {
     hideChallenge: hideChallenge,
     hideShortCycle: hideShortCycle,
     hideShortWalk: hideShortWalk,
+    hideShortAct: hideShortAct,
   }, function() {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -35,6 +37,7 @@ function restore_options() {
     hideChallenge: false,
     hideShortCycle: 0,
     hideShortWalk: 0,
+    hideShortAct: 0,
   }, function(items) {
     document.getElementById('action').value = items.action;
     document.getElementById('hide_commute').checked = items.hideCommute;
@@ -42,8 +45,10 @@ function restore_options() {
     document.getElementById('hide_challenge').checked = items.hideChallenge;
     var csSel = document.getElementById('hide_short_cycle');
     var cwSel = document.getElementById('hide_short_walk');
+    var caSel = document.getElementById('hide_short_act');
     setSelected(csSel, items.hideShortCycle)
     setSelected(cwSel, items.hideShortWalk)
+    setSelected(caSel, items.hideShortAct)
   });
 }
 

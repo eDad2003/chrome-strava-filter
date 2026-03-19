@@ -79,6 +79,22 @@
     return false;
   };
 
+  var isShortAct = function($activity, minMinutes) {
+    // doesn't matter on the activity type, so don't even look
+    var $stats = $activity.find('.list-stats .stat');
+    for(var i = 0; i < $stats.length; i++) {
+      var $stat = $( $stats[i] );
+      if($stat.find('.stat-subtext').text().toLowerCase().indexOf('time') >= 0) {
+        var $value = $stat.find('.stat-text');
+        //log("time=" + $value.text());
+        if(isShortDuration($value, minMinutes)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
   var isShortDistance = function($value, minMiles) {
     var unit = $value.find('.unit').text().toLowerCase().trim();
     var raw = $value.text().toLowerCase();
@@ -92,6 +108,30 @@
       }
     }
     return false;
+  }
+
+  var isShortDuration = function($value, minMinutes) {
+    // $value = "2h 33m 46s"
+    var totalDuration = 0;      //the total duration
+    var $arrTimes = $value.text().split(" ");
+    for (i= 0;i < $arrTimes.length; i++) {
+      var thisTime = $arrTimes[i];
+      if (thisTime.indexOf("h") > 0) {
+        totalDuration += thisTime.substring(0, thisTime.indexOf("h")) * 60;
+      }
+      else if (thisTime.indexOf("m") > 0) {
+        totalDuration += thisTime.substring(0, thisTime.indexOf("m")) * 1;
+      }
+      else if (thisTime.indexOf("s") > 0) {
+        totalDuration += thisTime.substring(0, thisTime.indexOf("s")) / 60;
+      }
+    }
+    if (totalDuration < minMinutes) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   var mark = function($activity, action) {
@@ -119,6 +159,8 @@
         return;
       }
 
+      //var $testing = "this is a test".split(" ");
+
       if(options.hideCommute && isCommute( $(this) )) {
         mark( $(this), options.action );
         log("Commute activity hidden");
@@ -144,6 +186,10 @@
         log("Short walk activity hidden");
       }
 
+      if(options.hideShortAct > 0 && isShortAct( $(this), options.hideShortAct )) {
+        mark( $(this), options.action );
+        log("Short duration activity hidden");
+      }
     });
 
     //$('.pagination a.load-feed').last().on('click', function() {
@@ -159,6 +205,7 @@
     hideChallenge: false,
     hideShortCycle: 0,
     hideShortWalk: 0,
+    hideShortAct: 0,
   };
 
   var options = defaultOptions;
